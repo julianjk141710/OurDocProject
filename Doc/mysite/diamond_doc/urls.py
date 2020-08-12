@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     # path('', views.sayHello),
-    path('apis/user/login', views.UserMethod.login_user),  # 登录
-    path('apis/user/logout', views.UserMethod.logout_user),  # 注销
-    path('apis/user/register', views.UserMethod.register),  # 注册
+    path('diamond/user/login', views.UserMethod.login_user),  # 登录
+    path('diamond/user/logout', views.UserMethod.logout_user),  # 注销
+    path('diamond/user/register', views.UserMethod.register),  # 注册
 ]
