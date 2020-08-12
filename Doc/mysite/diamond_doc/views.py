@@ -76,6 +76,7 @@ class UserMethod:
             username = data.get("email")
             password = data.get("password")
             email = data.get("email")
+            nickname = data.get("nickname")
             print(username)
             print(password)
             print(email)
@@ -84,6 +85,7 @@ class UserMethod:
                     user = User.objects.create_user(username=email, password=password, email=email)
                     user.save()
                     userInfo = UserInfo(user = user)
+                    userInfo.user_nickname = nickname
                     userInfo.save()
                     login_user = authenticate(request, username=username, password=password)
                     if login_user:
