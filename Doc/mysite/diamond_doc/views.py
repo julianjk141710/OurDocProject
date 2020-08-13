@@ -17,7 +17,7 @@ class UserMethod:
     def login_user(request):
         if request.method == "POST":
             data = json.loads(request.body)
-            email = data.get("username")
+            email = data.get("email")
             password = data.get("password")
             print("登陆")
             print(email)
@@ -68,6 +68,7 @@ class UserMethod:
                         "is_indb": 1
                     })
                 except:
+                    print("except")
                     return JsonResponse({
                         'status': 0,
                         "is_indb": 0
