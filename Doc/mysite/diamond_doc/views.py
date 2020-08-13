@@ -12,8 +12,9 @@ def sayHello(request):
     return HttpResponse("hello world")
 
 def getInfo(request):
-    if request.method == "GET":
-        show_myInfo = request.GET.get("myInfo")
+    if request.method == "POST":
+        data = json.loads(request.body)
+        show_myInfo = data.get("myInfo")
 
         if show_myInfo is not None and show_myInfo == "true":
             userInfo = UserInfo.objects.get(user = request.user)
@@ -22,6 +23,11 @@ def getInfo(request):
                 "nickname" : userInfo.user_nickname,
                 "password" : userInfo.user.password,
                 "email" : userInfo.user.email
+            })
+        else :
+            return JsonResponse({
+                "status" : 1,
+                "message": "请求错误"
             })
 
 class UserMethod:
@@ -66,6 +72,10 @@ class UserMethod:
                     "status": 2,
                     "message": "参数错误"
                 })
+        return JsonResponse({
+            "status": 3,
+            "message": "请求错误"
+        })
 
 
     # 注销
@@ -156,6 +166,9 @@ class UserMethod:
             else :
                 userInfo = UserInfo.objects.get(user = request.user)
                 userInfo.user_nickname = new_nickname
+                userInfo.save()
+                print(userInfo.user.email)
+                print(userInfo.user_nickname)
                 #修改成功返回status、message、以及修改后的新昵称new_nickname
                 return JsonResponse({
                     "status" : 1,
