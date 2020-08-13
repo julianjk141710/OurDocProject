@@ -1,3 +1,5 @@
+import django.utils.timezone as timezone
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -6,6 +8,19 @@ class UserInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userinfo')
     user_nickname = models.CharField(max_length = 16, null = True)
     user_icon = models.URLField(null = True)
+
+class FileInfomation(models.Model):
+    # file_id = models.AutoField(primary_key=True)
+    file_name = models.CharField(max_length = 64)
+    file_founder = models.ForeignKey(UserInfo, on_delete = models.CASCADE)
+    file_foundTime = models.DateTimeField(auto_now_add = True)
+    file_lastBrowseTime = models.DateTimeField(default=timezone.now)
+    file_lastModifiedTime = models.DateTimeField(auto_now = True)
+    file_doc = models.FileField(upload_to = 'word/')
+    file_size = models.IntegerField(default=0)
+    # file_teamBelong = models.ForeignKey(TeamInfo, on_delete = models.CASCADE)
+
+
 
 # class TeamInfo(models.Model):
 #     team_id = models.IntegerField(primary_key=True)
@@ -19,13 +34,7 @@ class UserInfo(models.Model):
 #         unique_together = (("team_id", "user_id"),)
 #
 #
-# class FileInfo(models.Model):
-#     file_id = models.IntegerField(primary_key=True)
-#     file_name = models.CharField(max_length = 64)
-#     file_founder = models.ForeignKey(UserInfo, on_delete = models.CASCADE)
-#     file_foundTime = models.DateTimeField(auto_now_add = True)
-#     file_lastModifiedTime = models.DateTimeField(auto_now = True)
-#     file_teamBelong = models.ForeignKey(TeamInfo, on_delete = models.CASCADE)
+
 #
 # class AdminInfo(models.Model):
 #     admin_id = models.IntegerField(primary_key = True)

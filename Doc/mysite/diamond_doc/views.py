@@ -3,7 +3,7 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
-from .models import UserInfo
+from .models import UserInfo, FileInfomation
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
@@ -25,10 +25,71 @@ def getInfo(request):
                 "email" : userInfo.user.email
             })
         else :
+            #
             return JsonResponse({
                 "status" : 1,
                 "message": "请求错误"
             })
+
+class FileMethod:
+    @staticmethod
+    def hello(request):
+        print()
+
+    #Headers key:content-type value:multipart/form-data
+    #body key:前端的变量名 value:参数值
+    @staticmethod
+    def getFile(request):
+        if request.method == "POST":
+            #获取前端传来的word文件 前端字段是word
+            file_doc = request.FILES.get("word")
+            file_name = request.POST.get("file_name")
+            tmpUser = UserInfo.objects.get(user = request.user)
+            fileInfo = FileInfomation(file_founder = tmpUser, file_doc = file_doc,file_name = file_name)
+            fileInfo.save()
+            return JsonResponse({
+                "status":"0",
+                "message":"文件上传成功"
+            })
+        else:
+            return JsonResponse({
+                "status":"1",
+                "message":"文件上传失败"
+            })
+
+    @staticmethod
+    def recentBrowse(request):
+        if request.method == "POST":
+            data = json.loads(request.body)
+            recent = data.get("recent")
+            if recent is not None and recent == "recent":
+                tmpUser = request.user
+                userInfo = UserInfo.objects.get(user = tmpUser)
+                recentFiles = FileInfomation.objects.filter(file_founder = userInfo).order_by("file_lastBrowseTime")
+                recentFilesList = list(recentFiles)
+                retList = []
+                cnt = 0
+                for i in recentFilesList:
+                    retList.append(i.file_name)
+                    cnt += 1
+                return JsonResponse({
+                    "status":1,
+                    # "list":recentFilesList
+                    "list":retList,
+                    "message":"已经返回最近浏览的文件名字列表"
+                })
+            else:
+                return JsonResponse({
+                    "status":2,
+                    "message":"请求参数错误"
+                })
+        return JsonResponse({
+            "status": 3,
+            "message": "请求方法错误"
+        })
+
+
+
 
 class UserMethod:
     @staticmethod
