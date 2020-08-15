@@ -1,4 +1,8 @@
-import time
-a = int(str(time.time()).split('.')[0])
-print(type(a))
-print(a)
+
+
+
+sum = 0
+for x in range(10):
+    sum += x
+print('************')
+print(sum)

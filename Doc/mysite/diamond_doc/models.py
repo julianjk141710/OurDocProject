@@ -5,6 +5,7 @@ from django.db import models
 
 # Create your models here.
 class UserInfo(models.Model):
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userinfo')
     user_nickname = models.CharField(max_length = 16, null = True)
     user_icon = models.URLField(null = True)
@@ -41,18 +42,38 @@ class RecentBrowse(models.Model):
 
 
 class TeamInfo(models.Model):
-    team_id = models.IntegerField(default = int(str(time.time()).split('.')[0]))
+    team_id = models.IntegerField(default = 0)
     team_manager = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
     team_name = models.CharField(max_length = 16)
     team_description = models.CharField(max_length = 256)
     class Meta:
         unique_together = (("team_id"),)
-#
-# class TeamUser(models.Model):
-#     team_id = models.ForeignKey(TeamInfo, on_delete= models.CASCADE)
-#     user_id = models.ForeignKey(UserInfo, on_delete= models.CASCADE)
-#     class Meta:
-#         unique_together = (("team_id", "user_id"),)
+
+class GeneralAuthority(models.Model):
+    file_info = models.ForeignKey(FileInformation, on_delete=models.CASCADE)
+    read_file = models.SmallIntegerField()
+    write_file = models.SmallIntegerField()
+    share_file = models.SmallIntegerField()
+    review_file = models.SmallIntegerField()
+    class Meta:
+        unique_together = (("file_info"),)
+
+class SpecificAuthority(models.Model):
+    file_info = models.ForeignKey(FileInformation, on_delete=models.CASCADE)
+    user_info = models.ForeignKey(UserInfo, on_delete = models.CASCADE)
+    read_file = models.SmallIntegerField()
+    write_file = models.SmallIntegerField()
+    share_file = models.SmallIntegerField()
+    review_file = models.SmallIntegerField()
+    class Meta:
+        unique_together = (("user_info", "file_info"),)
+
+
+class TeamUser(models.Model):
+    team_info = models.ForeignKey(TeamInfo, on_delete= models.CASCADE)
+    user_info = models.ForeignKey(UserInfo, on_delete= models.CASCADE)
+    class Meta:
+        unique_together = (("team_info", "user_info"),)
 #
 #
 
@@ -66,13 +87,13 @@ class TeamInfo(models.Model):
 
 
 
-# class Favorites(models.Model):
-#     favorite_id = models.IntegerField(primary_key = True)
-#     user_id = models.ForeignKey(UserInfo, on_delete = models.CASCADE)
-#     file_num = models.IntegerField()
-#     class Meta:
-#         unique_together = (("user_id"),)
-#
+class Favorites(models.Model):
+    favorite_id = models.IntegerField(default = 0)
+    user_info = models.ForeignKey(UserInfo, on_delete = models.CASCADE)
+    file_info = models.ForeignKey(FileInformation, on_delete = models.CASCADE)
+    class Meta:
+        unique_together = (("user_info", "file_info","favorite_id"),)
+
 # class FavoritesFile(models.Model):
 #     favorite_id = models.ForeignKey(Favorites, on_delete = models.CASCADE)
 #     file_id = models.ForeignKey(FileInfo, on_delete = models.CASCADE)
@@ -83,14 +104,7 @@ class TeamInfo(models.Model):
 #
 
 #
-# class GeneralAuthority(models.Model):
-#     file_id = models.ForeignKey(FileInfo, on_delete=models.CASCADE)
-#     read_file = models.SmallIntegerField()
-#     write_file = models.SmallIntegerField()
-#     share_file = models.SmallIntegerField()
-#     review_file = models.SmallIntegerField()
-#     class Meta:
-#         unique_together = (("file_id"),)
+
 #
 # class SpecificAuthority(models.Model):
 #     file_id = models.ForeignKey(FileInfo, on_delete=models.CASCADE)
