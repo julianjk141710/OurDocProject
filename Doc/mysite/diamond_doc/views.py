@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, AnonymousUser
 
 from .models import UserInfo, FileInformation, FileReview, RecentBrowse, TeamInfo, GeneralAuthority, SpecificAuthority, \
-    Favorites, TeamUser
+    Favorites, TeamUser, TeamFile
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
@@ -141,7 +141,38 @@ class FileMethod:
                 "message": "请求错误"
             })
 
-
+    @staticmethod
+    def myFile(request):
+        if request.method == "POST":
+            data = json.loads(request.body)
+            myfile = data.get("myfile")
+            if myfile is not None and myfile == "myfile":
+                tmpUser = request.user
+                userInfo = UserInfo.objects.filter(user = tmpUser).first()
+                fileSet = FileInformation.objects.filter(file_founder = userInfo)
+                fileNameSet = []
+                fileIdSet = []
+                cnt = 0
+                for i in fileSet:
+                    if i.file_is_delete == 0:
+                        fileNameSet.append(i.file_name)
+                        fileIdSet.append(i.file_id)
+                        cnt += 1
+                return JsonResponse({
+                    "status": 0,
+                    "fileNameSet":fileNameSet,
+                    "fileIdSet":fileIdSet
+                })
+            else:
+                return JsonResponse({
+                    "status": 1,
+                    "message" : "参数错误"
+                })
+        else:
+            return JsonResponse({
+                "status": 2,
+                "message":"请求错误"
+            })
     #用于申请编辑文档 如果当前没人占用此文档 就会返回该文档的全部信息（数据库里存储的有关本文档的全部内容）
     #editFile:editFile
     #file_id:file_id
@@ -285,8 +316,10 @@ class FileMethod:
             data = json.loads(request.body)
             upload = data.get("upload")
             if upload == "upload":
+                print("这个是upload")
                 content = data.get("content")
                 if content is not None:
+                    print("content不是空值")
                     tmpUser = request.user
                     file_name = data.get("file_name")
                     userInfo = UserInfo.objects.get(user = tmpUser)
@@ -614,6 +647,118 @@ class FileMethod:
                 "message": "请求错误"
             })
 
+    @staticmethod
+    def addFileToTeam(request):
+        if request.method == "POST":
+            data = json.loads(request.body)
+            addFileToTeam = data.get("addFileToTeam")
+            if addFileToTeam is not None and addFileToTeam == "addFileToTeam":
+                file_id = data.get("file_id")
+                team_id = data.get("team_id")
+                fileInfo = FileInformation.objects.filter(file_id = file_id).first()
+                teamInfo = TeamInfo.objects.filter(team_id = team_id).first()
+                if teamInfo and fileInfo:
+                    fileExistence = TeamFile.objects.filter(file_info = fileInfo)
+                    if fileExistence:
+                        return JsonResponse({
+                            "status":1,
+                            "message":"团队中已经包含该文档"
+                        })
+                    else:
+                        teamFile = TeamFile(file_info = fileInfo, team_info = teamInfo)
+                        teamFile.save()
+                        return JsonResponse({
+                            "status":0,
+                            "file_id":file_id,
+                            "team_id":team_id
+                        })
+                else:
+                    return JsonResponse({
+                        "status":1,
+                        "message":"团队或文档不存在"
+                    })
+            else :
+                return JsonResponse({
+                    "status": 2,
+                    "message": "参数错误"
+                })
+        else:
+            return JsonResponse({
+                "status": 3,
+                "message": "请求错误"
+            })
+
+    @staticmethod
+    def deleteFileFromTeam(request):
+        if request.method == "POST":
+            data = json.loads(request.body)
+            deleteFileFromTeam = data.get("deleteFileFromTeam")
+            if deleteFileFromTeam is not None and deleteFileFromTeam == "deleteFileFromTeam":
+                file_id = data.get("file_id")
+                team_id = data.get("team_id")
+                fileInfo = FileInformation.objects.filter(file_id=file_id).first()
+                teamInfo = TeamInfo.objects.filter(team_id=team_id).first()
+                if teamInfo and fileInfo:
+                    teamFile = TeamFile.objects.filter(file_info = fileInfo, team_info = teamInfo)
+                    teamFile.delete()
+                    return JsonResponse({
+                        "status": 0,
+                        "message":"删除成功"
+                    })
+                else:
+                    return JsonResponse({
+                        "status": 1,
+                        "message": "团队或文档不存在"
+                    })
+            else:
+                return JsonResponse({
+                    "status": 2,
+                    "message": "参数错误"
+                })
+        else:
+            return JsonResponse({
+                "status": 3,
+                "message": "请求错误"
+            })
+
+    @staticmethod
+    def showTeamFile(request):
+        if request.method == "POST":
+            data = json.loads(request.body)
+            showteamfile = data.get("showteamfile")
+            if showteamfile is not None and showteamfile == "showteamfile":
+                team_id = data.get("team_id")
+                teamInfo = TeamInfo.objects.filter(team_id = team_id).first()
+                if teamInfo:
+                    teamfilelist = TeamFile.objects.filter(team_info = teamInfo)
+                    retFileIdList = []
+                    retFileNameList = []
+                    for i in teamfilelist:
+                        retFileIdList.append(i.file_info.file_id)
+                        retFileNameList.append(i.file_info.file_name)
+                    return JsonResponse({
+                        "status":0,
+                        "retFileIdList":retFileIdList,
+                        "retFileNameList":retFileNameList
+                    })
+                else:
+                    return JsonResponse({
+                        "status": 1,
+                        "message":"团队不存在"
+                    })
+            else:
+                return JsonResponse({
+                    "status": 2,
+                    "message": "参数错误"
+                })
+        else:
+            return JsonResponse({
+                "status": 3,
+                "message": "请求错误"
+            })
+
+
+
 
 class UserMethod:
 
@@ -646,6 +791,7 @@ class UserMethod:
     @staticmethod
     def login_user(request):
         if request.method == "POST":
+            print("JPYJPY")
             data = json.loads(request.body)
             email = data.get("email")
             password = data.get("password")
@@ -1047,3 +1193,44 @@ def delete_teammate(request):
             "status": 3,
             "message": "error method"
         })
+
+def myTeam(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        myteam = data.get("myteam")
+        if myteam is not None and myteam == "myteam":
+            tmpUser = request.user
+            userInfo = UserInfo.objects.filter(user = tmpUser).first()
+            managerSet = TeamInfo.objects.filter(team_manager = userInfo)
+            memberSet = TeamUser.objects.filter(user_info = userInfo)
+            retTeamIdlist = []
+            retTeamNamelist = []
+            for i in managerSet:
+                retTeamIdlist.append(i.team_id)
+                retTeamNamelist.append(i.team_name)
+            for j in memberSet:
+                retTeamIdlist.append(j.team_info.team_id)
+                retTeamNamelist.append(j.team_info.team_name)
+            return JsonResponse({
+                "status":0,
+                "retTeamIdlist":retTeamIdlist,
+                "retTeamNamelist":retTeamNamelist
+            })
+        else:
+            return JsonResponse({
+                "status": 1,
+                "message" : "参数错误"
+            })
+    else:
+        return JsonResponse({
+            "status": 2,
+            "message": "请求错误"
+        })
+
+
+def test(request):
+    if request.method == "POST":
+        print("JPY请求成功！！！！！！")
+    return JsonResponse({
+        "status":0
+    })

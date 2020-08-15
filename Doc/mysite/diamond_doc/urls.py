@@ -27,14 +27,22 @@ urlpatterns = [
     path('apis/user/recoverfrom_recyclebin', views.FileMethod.recoverfrom_recyclebin),  # 恢复文档
     path('apis/user/shareFile', views.FileMethod.shareFile),  # 分享文档
     path('apis/user/create_team', views.create_team), #建立团队
-    path('apis/user/checkGeneralAuthority', views.FileMethod.checkGeneralAuthority), #建立团队
-    path('apis/user/checkSpecificAuthority', views.FileMethod.checkSpecificAuthority), #建立团队
-    path('apis/user/setGeneralAuthority', views.FileMethod.setGeneralAuthority), #建立团队
-    path('apis/user/setSpecificAuthority', views.FileMethod.setSpecificAuthority), #建立团队
+    path('apis/user/checkGeneralAuthority', views.FileMethod.checkGeneralAuthority), #检查文档的通用权限
+    path('apis/user/checkSpecificAuthority', views.FileMethod.checkSpecificAuthority), #检查文档的特定权限
+    path('apis/user/setGeneralAuthority', views.FileMethod.setGeneralAuthority), #设定文档的通用权限
+    path('apis/user/setSpecificAuthority', views.FileMethod.setSpecificAuthority), #设定文档的特定权限
     path('apis/user/add_favorite', views.add_favorite), #添加收藏
     path('apis/user/delete_favorite', views.delete_favorite), #删除收藏
-    path('apis/user/my_favorite', views.my_favorite), #删除收藏
+    path('apis/user/my_favorite', views.my_favorite), #获取收藏的文档id和名字
     # path('apis/user/file', views.FileMethod.getFile),#文件上传视图
-    path('apis/user/add_teammate', views.add_teammate), #删除收藏
-    path('apis/user/delete_teammate', views.delete_teammate) #删除收藏
+    path('apis/user/add_teammate', views.add_teammate), #添加团队成员
+    path('apis/user/delete_teammate', views.delete_teammate), #删除团队成员
+    path('apis/user/myFile', views.FileMethod.myFile), #获取我的文档
+    path('apis/user/myTeam', views.myTeam), #获取我参加的团队 包括创建的和加入的
+    path('apis/user/addFileToTeam', views.FileMethod.addFileToTeam), #将文档添加到团队
+    path('apis/user/deleteFileFromTeam', views.FileMethod.deleteFileFromTeam), #将文档从团队删除
+    path('apis/user/showTeamFile', views.FileMethod.showTeamFile), #展示团队文档
+    path('apis/user/test', views.test), #展示团队文档
+
+    # path('apis/user/bonjour', views.bonjour) #删除收藏
 ]

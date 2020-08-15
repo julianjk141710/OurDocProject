@@ -10,6 +10,14 @@ class UserInfo(models.Model):
     user_nickname = models.CharField(max_length = 16, null = True)
     user_icon = models.URLField(null = True)
 
+class TeamInfo(models.Model):
+    team_id = models.IntegerField(default = 0)
+    team_manager = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
+    team_name = models.CharField(max_length = 16)
+    team_description = models.CharField(max_length = 256)
+    class Meta:
+        unique_together = (("team_id"),)
+
 class FileInformation(models.Model):
     file_id = models.IntegerField(default = 0)
     file_name = models.CharField(max_length = 64)
@@ -22,9 +30,16 @@ class FileInformation(models.Model):
     file_text = models.TextField(default="")
     file_is_delete = models.SmallIntegerField(default=0)
     file_is_free = models.SmallIntegerField(default = 1)
-    # file_teamBelong = models.ForeignKey(TeamInfo, on_delete = models.CASCADE)
+    # file_teamBelong = models.ForeignKey(TeamInfo, on_delete = models.CASCADE, default = None)
     class Meta:
         unique_together = (("file_id"),)
+
+class TeamFile(models.Model):
+    file_info = models.ForeignKey(FileInformation, on_delete=models.CASCADE)
+    team_info = models.ForeignKey(TeamInfo, on_delete=models.CASCADE)
+    class Meta:
+        unique_together = (("file_info", "team_info"),)
+
 
 class FileReview(models.Model):
     file_id = models.ForeignKey(FileInformation, on_delete = models.CASCADE)
@@ -41,13 +56,7 @@ class RecentBrowse(models.Model):
         unique_together = (("user_id", "file_id"),)
 
 
-class TeamInfo(models.Model):
-    team_id = models.IntegerField(default = 0)
-    team_manager = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
-    team_name = models.CharField(max_length = 16)
-    team_description = models.CharField(max_length = 256)
-    class Meta:
-        unique_together = (("team_id"),)
+
 
 class GeneralAuthority(models.Model):
     file_info = models.ForeignKey(FileInformation, on_delete=models.CASCADE)
@@ -74,8 +83,6 @@ class TeamUser(models.Model):
     user_info = models.ForeignKey(UserInfo, on_delete= models.CASCADE)
     class Meta:
         unique_together = (("team_info", "user_info"),)
-#
-#
 
 #
 # class AdminInfo(models.Model):
@@ -94,25 +101,6 @@ class Favorites(models.Model):
     class Meta:
         unique_together = (("user_info", "file_info","favorite_id"),)
 
-# class FavoritesFile(models.Model):
-#     favorite_id = models.ForeignKey(Favorites, on_delete = models.CASCADE)
-#     file_id = models.ForeignKey(FileInfo, on_delete = models.CASCADE)
-#     class Meta:
-#         unique_together = (("favorite_id", "file_id"),)
-#
 
-#
 
-#
-
-#
-# class SpecificAuthority(models.Model):
-#     file_id = models.ForeignKey(FileInfo, on_delete=models.CASCADE)
-#     user_id = models.ForeignKey(UserInfo, on_delete = models.CASCADE)
-#     read_file = models.SmallIntegerField()
-#     write_file = models.SmallIntegerField()
-#     share_file = models.SmallIntegerField()
-#     review_file = models.SmallIntegerField()
-#     class Meta:
-#         unique_together = (("user_id", "file_id"),)
 
