@@ -35,7 +35,7 @@ urlpatterns = [
     path('apis/user/delete_favorite', views.delete_favorite), #删除收藏
     path('apis/user/my_favorite', views.my_favorite), #获取收藏的文档id和名字
     # path('apis/user/file', views.FileMethod.getFile),#文件上传视图
-    path('apis/user/add_teammate', views.add_teammate), #添加团队成员
+    # path('apis/user/add_teammate', views.add_teammate), #添加团队成员
     path('apis/user/delete_teammate', views.delete_teammate), #删除团队成员
     path('apis/user/myFile', views.FileMethod.myFile), #获取我的文档
     path('apis/user/myTeam', views.myTeam), #获取我参加的团队 包括创建的和加入的
@@ -43,8 +43,13 @@ urlpatterns = [
     path('apis/user/deleteFileFromTeam', views.FileMethod.deleteFileFromTeam), #将文档从团队删除
     path('apis/user/showTeamFile', views.FileMethod.showTeamFile), #展示团队文档
     path('apis/user/test', views.test), #展示团队文档
-    path('apis/user/delete_file', views.delete_file), #展示团队文档
-    path('apis/user/recyclebin_file', views.recyclebin_file),  # 展示团队文档
+    path('apis/user/delete_file', views.delete_file), #彻底删除文档
+    path('apis/user/recyclebin_file', views.recyclebin_file),  # 展示回收站文档
     path('apis/user/showTemplates', views.showTemplates),  # 展示模版文档
+    path('apis/user/postMessage', views.postMessage),  # 发送站内信
+    path('apis/user/myNotifications', views.myNotifications),  # 展示我的站内信
+    path('apis/user/hasRead', views.hasRead),  # 将站内信标示为已读
+    path('apis/user/send_invitation', views.send_invitation),  # 发送团队邀请
+    path('apis/user/addinto_team', views.addinto_team),#同意加入队伍
     # path('apis/user/bonjour', views.bonjour) #删除收藏
 ]

@@ -110,6 +110,17 @@ class DocTemplates(models.Model):
         unique_together = (("template_id"),)
 
 
+class NotificationsInfo(models.Model):
+    noti_id = models.IntegerField(default = 0)
+    post_info = models.CharField(default="", max_length=64)
+    receive_info = models.CharField(default="", max_length=64)
+    notification_text = models.TextField(default="")
+    post_time = models.DateTimeField(auto_now_add=True)
+    is_new = models.SmallIntegerField(default=1)
+    is_invitation = models.SmallIntegerField(default=0)
+    class Meta:
+        unique_together = (("noti_id", "post_info", "receive_info",),)
+
 
 
 

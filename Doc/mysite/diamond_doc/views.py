@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, AnonymousUser
 
 from .models import UserInfo, FileInformation, FileReview, RecentBrowse, TeamInfo, GeneralAuthority, SpecificAuthority, \
-    Favorites, TeamUser, TeamFile, DocTemplates
+    Favorites, TeamUser, TeamFile, DocTemplates, NotificationsInfo
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
@@ -189,6 +189,8 @@ class FileMethod:
                     if retFile.file_is_free == 1 and retFile.file_is_delete == 0:
                         retFile.file_is_free = 0
                         retFile.save()
+                        recentbrowse = RecentBrowse(file_id = retFile, user_id = UserInfo.objects.filter(user =request.user).first())
+                        recentbrowse.save()
                         return JsonResponse({
                             "status": 0,
                             "file_text": retFile.file_text,
@@ -268,6 +270,7 @@ class FileMethod:
     def recentBrowse(request):
         if request.method == "POST":
             data = json.loads(request.body)
+            print("最近浏览")
             recent = data.get("recent")
             if recent is not None and recent == "recent":
                 tmpUser = request.user
@@ -277,7 +280,7 @@ class FileMethod:
                 retNameList = []
                 retTimeList = []
                 retFileIdList = []
-                cnt = 0
+                cnt = 0#
                 for i in recentFilesList:
                     if i.file_id.file_is_delete != 1:
                         retNameList.append(i.file_id.file_name)
@@ -286,11 +289,12 @@ class FileMethod:
                         cnt += 1
                 return JsonResponse({
                     "status":1,
-                    # "list":recentFilesList
+                    "list":recentFilesList,
                     "namelist":retNameList,
                     "timelist":retTimeList,
                     "fileIdList":retFileIdList,
-                    "message":"已经返回最近浏览的文件名字列表"
+                    "timeList":retTimeList,
+                    "message":"已经返回最近浏览的文件名字列表",
                 })
             else:
                 return JsonResponse({
@@ -444,8 +448,10 @@ class FileMethod:
     @staticmethod
     def checkSpecificAuthority(request):
         if request.method == "POST":
+            print("检查特定权限")
             data = json.loads(request.body)
             checkSpecificAuthority = data.get("checkSpecificAuthority")
+            print(checkSpecificAuthority)
             if checkSpecificAuthority is not None and checkSpecificAuthority == "checkSpecificAuthority":
                 tmpUser = request.user
                 userInfo = UserInfo.objects.filter(user = tmpUser).first()
@@ -998,6 +1004,7 @@ def create_team(request):
 
 def add_favorite(request):
     if request.method == "POST":
+        print("favorite")
         data = json.loads(request.body)
         add_favorite = data.get("add_favorite")
         if add_favorite is not None and add_favorite=="add_favorite":
@@ -1083,6 +1090,7 @@ def my_favorite(request):
             return JsonResponse({
                 "status": 1,
                 "favoriteIdlist": retFavoriteIdList,
+                "fileIdList":retFileIdList,
                 "namelist": retNameList,
                 "message": "已经返回用户收藏夹的文件名字列表"
             })
@@ -1097,37 +1105,28 @@ def my_favorite(request):
     })
 
 
-def add_teammate(request):
+def addinto_team(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        add_teammate = data.get("add_teammate")
-        if add_teammate is not None and add_teammate=="add_teammate":
-            #团队管理员
-            teamManageUser = request.user
-            teamManageuserInfo = UserInfo.objects.filter(user = teamManageUser).first()
+        addinto_team = data.get("addinto_team")
+        if addinto_team is not None and addinto_team=="addinto_team":
+            #消息
+            tmpinfo=NotificationsInfo.objects.filter(noti_id=data.get("noti_id")).first()
+            #被邀请用户
+            tmpUser = request.user
+            userInfo = UserInfo.objects.filter(user = tmpUser).first()
             #团队
-            teamInfo = TeamInfo.objects.filter(team_id=data.get("team_id")).first()
-            #用户
-            user_email = data.get("user_email")
-            tmpUser = UserInfo()
-            userSet = UserInfo.objects.all()
-            flag = 0
-            for i in userSet:
-                if i.user.email == user_email:
-                    tmpUser = i
-                    flag += 1
-                    break
-            #团队与管理员对应
-            teamMatch=TeamInfo.objects.filter(team_manager=teamManageuserInfo,team_id=data.get("team_id")).first()
-            if teamInfo and flag == 1 and teamManageuserInfo and teamMatch:
+            teamInfo = TeamInfo.objects.filter(team_id=tmpinfo.post_info).first()
+
+            if userInfo and teamInfo and tmpinfo.is_invitation==1 and tmpinfo.is_new==1 :
                 #该用户在该团队内
-                if TeamUser.objects.filter(user_info=tmpUser,team_info=teamInfo).first():
+                if TeamUser.objects.filter(user_info=userInfo,team_info=teamInfo).first():
                     return JsonResponse({
                         "status": 0,
                         "data": "该用户已在该团队内！"
                     })
                 else:
-                    db = TeamUser(user_info=tmpUser, team_info=teamInfo)
+                    db = TeamUser(user_info=userInfo, team_info=teamInfo)
                     db.save()
                     return JsonResponse({
                         "status": 1,
@@ -1136,13 +1135,59 @@ def add_teammate(request):
             else:
                 return JsonResponse({
                     "status": 2,
-                    "message": "团队、用户、团队所属人不存在或团队与所属人不匹配！"
+                    "message": "团队、用户不存在或该消息并不是一个邀请！"
                 })
     else:
         return JsonResponse({
             "status": 3,
             "message": "error method"
         })
+# def add_teammate(request):
+#     if request.method == "POST":
+#         data = json.loads(request.body)
+#         add_teammate = data.get("add_teammate")
+#         if add_teammate is not None and add_teammate=="add_teammate":
+#             #团队管理员
+#             teamManageUser = request.user
+#             teamManageuserInfo = UserInfo.objects.filter(user = teamManageUser).first()
+#             #团队
+#             teamInfo = TeamInfo.objects.filter(team_id=data.get("team_id")).first()
+#             #用户
+#             user_email = data.get("user_email")
+#             tmpUser = UserInfo()
+#             userSet = UserInfo.objects.all()
+#             flag = 0
+#             for i in userSet:
+#                 if i.user.email == user_email:
+#                     tmpUser = i
+#                     flag += 1
+#                     break
+#             #团队与管理员对应
+#             teamMatch=TeamInfo.objects.filter(team_manager=teamManageuserInfo,team_id=data.get("team_id")).first()
+#             if teamInfo and flag == 1 and teamManageuserInfo and teamMatch:
+#                 #该用户在该团队内
+#                 if TeamUser.objects.filter(user_info=tmpUser,team_info=teamInfo).first():
+#                     return JsonResponse({
+#                         "status": 0,
+#                         "data": "该用户已在该团队内！"
+#                     })
+#                 else:
+#                     db = TeamUser(user_info=tmpUser, team_info=teamInfo)
+#                     db.save()
+#                     return JsonResponse({
+#                         "status": 1,
+#                         "data": "用户添加成功！"
+#                     })
+#             else:
+#                 return JsonResponse({
+#                     "status": 2,
+#                     "message": "团队、用户、团队所属人不存在或团队与所属人不匹配！"
+#                 })
+#     else:
+#         return JsonResponse({
+#             "status": 3,
+#             "message": "error method"
+#         })
 
 def delete_teammate(request):
     if request.method == "POST":
@@ -1228,6 +1273,9 @@ def myTeam(request):
 def test(request):
     if request.method == "POST":
         print("JPY请求成功！！！！！！")
+        data = json.loads(request.body)
+        a = data.get("content")
+        print(a)
     return JsonResponse({
         "status":0
     })
@@ -1320,4 +1368,178 @@ def showTemplates(request):
         return JsonResponse({
             "status": 2,
             "message": "请求错误"
+        })
+
+
+def postMessage(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        postmessage = data.get("postmessage")
+        if postmessage is not None and postmessage == "postmessage":
+            receiveEmail = data.get("receiveEmail")
+            userSet = UserInfo.objects.all()
+            emailSet = []
+            for i in userSet:
+                emailSet.append(i.user.email)
+            flag = 0
+            for j in emailSet:
+                if j == receiveEmail:
+                    flag += 1
+            if flag:
+                post_info = request.user.email
+                notification_text = data.get("notification_text")
+                db = NotificationsInfo(noti_id = int(str(time.time()).split('.')[0]), post_info = post_info,
+                                       receive_info = receiveEmail, notification_text = notification_text,
+                                       is_new = 1, is_invitation = 0)
+                db.save()
+                return JsonResponse({
+                    "status" : 0,
+                    "message": "站内信发送成功"
+                })
+            else:
+                return JsonResponse({
+                    "status" :1,
+                    "message":"要联系的用户不存在"
+                })
+        else:
+            return JsonResponse({
+                "status": 2,
+                "message": "参数错误"
+            })
+    else:
+        return JsonResponse({
+            "status": 3,
+            "message": "请求错误"
+        })
+
+def myNotifications(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        mynotifications = data.get("mynotifications")
+        if mynotifications is not None and mynotifications == "mynotifications":
+            tmpUser = request.user
+            useremail = tmpUser.email
+            notiSet = NotificationsInfo.objects.filter(receive_info = useremail)
+            noti_idSet = []
+            post_infoSet = []
+            receive_infoSet = []
+            notification_textSet = []
+            post_timeSet = []
+            is_newSet = []
+            is_invitationSet = []
+            for i in notiSet:
+                noti_idSet.append(i.noti_id)
+                post_infoSet.append(i.post_info)
+                receive_infoSet.append(i.receive_info)
+                notification_textSet.append(i.notification_text)
+                post_timeSet.append(i.post_time)
+                is_newSet.append(i.is_new)
+                is_invitationSet.append(i.is_invitation)
+            return JsonResponse({
+                "status" : 0,
+                "noti_idSet":noti_idSet,
+                "post_infoSet":post_infoSet,
+                "receive_infoSet":receive_infoSet,
+                "notification_textSet":notification_textSet,
+                "post_timeSet":post_timeSet,
+                "is_newSet":is_newSet,
+                "is_invitationSet":is_invitationSet
+            })
+        else:
+            return JsonResponse({
+                "status":1,
+                "message":'参数错误'
+            })
+    else:
+        return JsonResponse({
+            "status": 2,
+            "message":"请求错误'"
+        })
+
+def hasRead(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        hasread = data.get("hasread")
+        if hasread is not None and hasread == "hasread":
+            noti_id = data.get("noti_id")
+            notiInfo = NotificationsInfo.objects.filter(noti_id = noti_id).first()
+            if notiInfo and notiInfo.is_new == 1:
+                notiInfo.is_new = 0
+                notiInfo.save()
+                return JsonResponse({
+                    "status": 0,
+                    "message": "通知被标识为已读"
+                })
+            else:
+                return JsonResponse({
+                    "status":1,
+                    "message":"通知不存在或者已经标识为已读"
+                })
+        else:
+            return JsonResponse({
+                "status": 2,
+                "message": "参数错误"
+            })
+    else:
+        return JsonResponse({
+            "status": 3,
+            "message": "请求错误"
+        })
+
+def send_invitation(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        sendInvitation = data.get("sendInvitation")
+        if sendInvitation is not None and sendInvitation == "sendInvitation":
+            # 团队管理员
+            tmpManagerUser = request.user
+            tmpManagerInfo = UserInfo.objects.filter(user=tmpManagerUser).first()
+            # 团队
+            teamInfo = TeamInfo.objects.filter(team_manager=tmpManagerInfo).first()
+            #被邀请用户
+            user_email = data.get("user_email")
+            tmpUser = UserInfo()
+            userSet = UserInfo.objects.all()
+            flag = 0
+            for i in userSet:
+                if i.user.email == user_email:
+                    tmpUser = i
+                    flag += 1
+                    break
+            print(tmpManagerInfo)
+            print(tmpUser)
+            print(teamInfo)
+            print(flag)
+            if tmpManagerInfo and tmpUser and teamInfo and flag:
+                if TeamUser.objects.filter(user_info=tmpUser,team_info=teamInfo).first():
+                    return JsonResponse({
+                        "status": 0,
+                        "message": "该用户已在该团队内！"
+                    })
+                else:
+                    db = NotificationsInfo( noti_id =int(str(time.time()).split('.')[0]),
+                                            post_info = teamInfo.team_id,
+                                            receive_info = tmpUser.user.email,
+                                            notification_text = "您收到一份团队邀请",
+                                            is_new = 1,
+                                            is_invitation = 1)
+                    db.save()
+                    return JsonResponse({
+                        "status": 1,
+                        "message": "发送邀请成功！"
+                    })
+            else:
+                return JsonResponse({
+                    "status": 2,
+                    "message": "团队或用户不存在！"
+                })
+        else:
+            return JsonResponse({
+                "status": 3,
+                "message": "参数错误"
+            })
+    else:
+        return JsonResponse({
+            "status": 4,
+            "message": "error method"
         })
