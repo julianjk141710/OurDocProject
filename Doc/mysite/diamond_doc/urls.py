@@ -45,5 +45,6 @@ urlpatterns = [
     path('apis/user/test', views.test), #展示团队文档
     path('apis/user/delete_file', views.delete_file), #展示团队文档
     path('apis/user/recyclebin_file', views.recyclebin_file),  # 展示团队文档
+    path('apis/user/showTemplates', views.showTemplates),  # 展示模版文档
     # path('apis/user/bonjour', views.bonjour) #删除收藏
 ]

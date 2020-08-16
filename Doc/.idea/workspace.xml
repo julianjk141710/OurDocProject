@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a7570c9b-6f02-4586-a145-2b508e9929b0" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/mysite/diamond_doc/migrations/0014_auto_20200816_1430.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mysite/diamond_doc/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/diamond_doc/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysite/diamond_doc/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/diamond_doc/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mysite/diamond_doc/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/diamond_doc/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -220,10 +221,10 @@
       <screen x="0" y="23" width="1440" height="805" />
     </state>
     <state x="363" y="64" key="SettingsEditor/1440.23.1920.1057/0.23.1440.805@0.23.1440.805" timestamp="1597214562676" />
-    <state x="426" y="251" key="com.intellij.ide.util.TipDialog" timestamp="1597453704190">
+    <state x="426" y="251" key="com.intellij.ide.util.TipDialog" timestamp="1597558809837">
       <screen x="0" y="23" width="1440" height="791" />
     </state>
-    <state x="426" y="251" key="com.intellij.ide.util.TipDialog/0.23.1440.791@0.23.1440.791" timestamp="1597453704190" />
+    <state x="426" y="251" key="com.intellij.ide.util.TipDialog/0.23.1440.791@0.23.1440.791" timestamp="1597558809837" />
     <state x="426" y="254" key="com.intellij.ide.util.TipDialog/0.23.1440.803@0.23.1440.803" timestamp="1597235512199" />
     <state x="348" y="93" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1597453775608">
       <screen x="0" y="23" width="1440" height="793" />

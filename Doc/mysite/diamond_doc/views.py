@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, AnonymousUser
 
 from .models import UserInfo, FileInformation, FileReview, RecentBrowse, TeamInfo, GeneralAuthority, SpecificAuthority, \
-    Favorites, TeamUser, TeamFile
+    Favorites, TeamUser, TeamFile, DocTemplates
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
@@ -464,11 +464,10 @@ class FileMethod:
                                 "review": speAuthority.review_file,
                             })
                         else:
-
-                                return JsonResponse({
-                                    "status": 1,
-                                    "message":"该用户不存在该文件的特定权限"
-                                })
+                            return JsonResponse({
+                                "status": 1,
+                                "message": "该用户不存在该文件的特定权限"
+                            })
                     else:
                         return JsonResponse({
                             "status": 1,
@@ -1292,3 +1291,33 @@ def recyclebin_file(request):
         "status": 3,
         "message": "请求方法错误"
     })
+
+def showTemplates(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        showtemplates = data.get("showtemplates")
+        if showtemplates is not None and showtemplates == "showtemplates":
+            templateslist = DocTemplates.objects.filter().all()
+            retTemplatesText = []
+            retTemplatesName = []
+            retTemplatesId = []
+            for i in templateslist:
+                retTemplatesId.append(i.template_id)
+                retTemplatesName.append(i.template_name)
+                retTemplatesText.append(i.template_text)
+            return JsonResponse({
+                "status": 0,
+                "retTemplatesId":retTemplatesId,
+                "retTemplatesName":retTemplatesName,
+                "retTemplatesText":retTemplatesText
+            })
+        else:
+            return JsonResponse({
+                "status":1,
+                "message":"参数错误"
+            })
+    else:
+        return JsonResponse({
+            "status": 2,
+            "message": "请求错误"
+        })

@@ -45,6 +45,7 @@ class FileReview(models.Model):
     file_id = models.ForeignKey(FileInformation, on_delete = models.CASCADE)
     user_id = models.ForeignKey(UserInfo, on_delete = models.CASCADE)
     review_text = models.CharField(max_length = 512)
+    review_time = models.DateTimeField(auto_now_add = True)
     class Meta:
         unique_together = (("file_id"),)
 
@@ -100,6 +101,14 @@ class Favorites(models.Model):
     file_info = models.ForeignKey(FileInformation, on_delete = models.CASCADE)
     class Meta:
         unique_together = (("user_info", "file_info","favorite_id"),)
+
+class DocTemplates(models.Model):
+    template_id = models.IntegerField(default = 0)
+    template_text = models.TextField(default="")
+    template_name = models.CharField(max_length=32)
+    class Meta:
+        unique_together = (("template_id"),)
+
 
 
 
