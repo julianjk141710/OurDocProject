@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a7570c9b-6f02-4586-a145-2b508e9929b0" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/mysite/diamond_doc/migrations/0013_teamfile.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mysite/diamond_doc/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/diamond_doc/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mysite/diamond_doc/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/diamond_doc/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mysite/diamond_doc/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/diamond_doc/views.py" afterDir="false" />
     </list>

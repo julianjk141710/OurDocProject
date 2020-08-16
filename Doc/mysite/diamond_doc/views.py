@@ -1076,13 +1076,11 @@ def my_favorite(request):
             retNameList = []
             retFavoriteIdList = []
             retFileIdList = []
-            cnt = 0
             for i in myFavoriteList:
                 if i.file_info.file_is_delete != 1:
                     retFavoriteIdList.append(i.favorite_id)
                     retNameList.append(i.file_info.file_name)
                     retFileIdList.append(i.file_info.file_id)
-                    cnt += 1
             return JsonResponse({
                 "status": 1,
                 "favoriteIdlist": retFavoriteIdList,
@@ -1233,4 +1231,64 @@ def test(request):
         print("JPY请求成功！！！！！！")
     return JsonResponse({
         "status":0
+    })
+
+
+def delete_file(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        delete_file = data.get("delete_file")
+        if delete_file is not None and delete_file == "delete_file":
+            fileInfo = FileInformation.objects.filter(file_id=data.get("file_id")).first()
+            if fileInfo and fileInfo.file_is_delete == 1:
+                fileInfo.delete()
+                return JsonResponse({
+                    "status": 0,
+                    "data": "删除成功"
+                })
+            else:
+                return JsonResponse({
+                    "status": 1,
+                    "message": "该文件不存在或不在回收站中"
+                })
+        else:
+            return JsonResponse({
+                "status": 2,
+                "message": "参数错误"
+            })
+    else:
+        return JsonResponse({
+            "status": 3,
+            "message": "请求错误"
+        })
+
+def recyclebin_file(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        getrecyclebin_file = data.get("getrecyclebin_file")
+        if getrecyclebin_file is not None and getrecyclebin_file == "getrecyclebin_file":
+            tmpUser = request.user
+            userInfo = UserInfo.objects.get(user=tmpUser)
+            recyclebinFiles = FileInformation.objects.filter(file_founder=userInfo)
+            retNameList = []
+            retIdList = []
+            for i in recyclebinFiles:
+                if i.file_is_delete != 0:
+                    retNameList.append(i.file_name)
+                    retIdList.append(i.file_id)
+
+            return JsonResponse({
+                "status": 1,
+                "namelist": retNameList,
+                "timelist": retIdList,
+                "message": "已经返回最近浏览的文件名字列表"
+            })
+        else:
+            return JsonResponse({
+                "status": 2,
+                "message": "请求参数错误"
+            })
+    return JsonResponse({
+        "status": 3,
+        "message": "请求方法错误"
     })

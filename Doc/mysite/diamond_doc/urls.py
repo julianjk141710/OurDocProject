@@ -43,6 +43,7 @@ urlpatterns = [
     path('apis/user/deleteFileFromTeam', views.FileMethod.deleteFileFromTeam), #将文档从团队删除
     path('apis/user/showTeamFile', views.FileMethod.showTeamFile), #展示团队文档
     path('apis/user/test', views.test), #展示团队文档
-
+    path('apis/user/delete_file', views.delete_file), #展示团队文档
+    path('apis/user/recyclebin_file', views.recyclebin_file),  # 展示团队文档
     # path('apis/user/bonjour', views.bonjour) #删除收藏
 ]
