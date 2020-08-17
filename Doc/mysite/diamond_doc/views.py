@@ -228,11 +228,14 @@ class FileMethod:
     #file_id:file_id
     #newContent:更新后的富文本内容
     #newName:更新后的文档名字 即使没改名字也要给后端
+
+    #browseFile:browseFile
     @staticmethod
     def postModifiedFile(request):
         if request.method == "POST":
             data = json.loads(request.body)
             postFile = data.get("postFile")
+            browseFile = data.get("browseFile")
             if postFile is not None and postFile == "postFile":
                 file_id = data.get("file_id")
                 fileInfo = FileInformation.objects.filter(file_id = file_id).first()
@@ -251,6 +254,21 @@ class FileMethod:
                     return JsonResponse({
                         "status": 1,
                         "message": "要更改的文档不存在"
+                    })
+            elif browseFile is not None and browseFile == "browseFile":
+                file_id = data.get("file_id")
+                fileInfo = FileInformation.objects.filter(file_id=file_id).first()
+                if fileInfo:
+                    fileInfo.file_is_free = 1
+                    return JsonResponse({
+                        "status": 0,
+                        "message": "读文档结束"
+
+                    })
+                else:
+                    return JsonResponse({
+                        "status": 1,
+                        "message": "文档不存在"
                     })
             else:
                 return JsonResponse({
