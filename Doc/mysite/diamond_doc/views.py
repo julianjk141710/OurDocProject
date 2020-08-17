@@ -189,8 +189,12 @@ class FileMethod:
                     if retFile.file_is_free == 1 and retFile.file_is_delete == 0:
                         retFile.file_is_free = 0
                         retFile.save()
-                        recentbrowse = RecentBrowse(file_id = retFile, user_id = UserInfo.objects.filter(user =request.user).first())
-                        recentbrowse.save()
+                        record = RecentBrowse.objects.filter(file_id = retFile).first()
+                        if record:
+                            record.save()
+                        else:
+                            recentbrowse = RecentBrowse(file_id = retFile, user_id = UserInfo.objects.filter(user =request.user).first())
+                            recentbrowse.save()
                         return JsonResponse({
                             "status": 0,
                             "file_text": retFile.file_text,
