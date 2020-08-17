@@ -289,13 +289,11 @@ class FileMethod:
                         cnt += 1
                 return JsonResponse({
                     "status":1,
-                    "list":recentFilesList,
                     "namelist":retNameList,
                     "timelist":retTimeList,
                     "fileIdList":retFileIdList,
-                    "timeList":retTimeList,
                     "message":"已经返回最近浏览的文件名字列表",
-                })
+                }, safe = False)
             else:
                 return JsonResponse({
                     "status":2,
@@ -927,7 +925,31 @@ class UserMethod:
                 })
 
 
-
+    @staticmethod
+    def modifyPassword(request):
+        if request.method == "POST":
+            data = json.loads(request.body)
+            modifypassword = "modifypassword"
+            if modifypassword is not None and modifypassword == "modifypassword":
+                newPassword = data.get("newPassword")
+                tmpUser = request.user
+                userInfo = UserInfo.objects.filter(user = tmpUser).first()
+                userInfo.user.set_password(newPassword)
+                userInfo.user.save()
+                return JsonResponse({
+                    "status":0,
+                    "message":"修改密码成功"
+                })
+            else:
+                return JsonResponse({
+                    "status": 1,
+                    "message": "参数错误"
+                })
+        else:
+            return JsonResponse({
+                "status": 2,
+                "message": "请求错误"
+            })
 
 #用于给文档添加评论
 #add_review:add_review
@@ -1496,6 +1518,7 @@ def send_invitation(request):
             tmpManagerInfo = UserInfo.objects.filter(user=tmpManagerUser).first()
             # 团队
             teamInfo = TeamInfo.objects.filter(team_manager=tmpManagerInfo).first()
+            teamName = teamInfo.team_name
             #被邀请用户
             user_email = data.get("user_email")
             tmpUser = UserInfo()
@@ -1517,10 +1540,11 @@ def send_invitation(request):
                         "message": "该用户已在该团队内！"
                     })
                 else:
+                    nameText = "您收到一份来自" + teamName + "团队的邀请"
                     db = NotificationsInfo( noti_id =int(str(time.time()).split('.')[0]),
                                             post_info = teamInfo.team_id,
                                             receive_info = tmpUser.user.email,
-                                            notification_text = "您收到一份团队邀请",
+                                            notification_text = nameText,
                                             is_new = 1,
                                             is_invitation = 1)
                     db.save()

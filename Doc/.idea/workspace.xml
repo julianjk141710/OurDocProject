@@ -2,13 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a7570c9b-6f02-4586-a145-2b508e9929b0" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/mysite/diamond_doc/migrations/0015_notificationsinfo.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mysite/diamond_doc/migrations/0016_auto_20200816_1639.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mysite/diamond_doc/migrations/0017_notificationsinfo_is_invitation.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mysite/diamond_doc/migrations/0018_auto_20200816_1711.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mysite/diamond_doc/migrations/0019_notificationsinfo_post_time.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Doc.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mysite/diamond_doc/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/diamond_doc/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mysite/diamond_doc/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/diamond_doc/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mysite/diamond_doc/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/diamond_doc/views.py" afterDir="false" />
     </list>
@@ -47,6 +42,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="run.code.analysis.last.selected.profile" value="aDefault" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -186,6 +182,10 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="473" y="281" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1597627149026">
+      <screen x="0" y="23" width="1440" height="791" />
+    </state>
+    <state x="473" y="281" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.23.1440.791@0.23.1440.791" timestamp="1597627149026" />
     <state width="1305" height="202" key="GridCell.Tab.0.bottom" timestamp="1597507849845">
       <screen x="0" y="23" width="1440" height="793" />
     </state>
@@ -226,10 +226,10 @@
       <screen x="0" y="23" width="1440" height="805" />
     </state>
     <state x="363" y="64" key="SettingsEditor/1440.23.1920.1057/0.23.1440.805@0.23.1440.805" timestamp="1597214562676" />
-    <state x="426" y="254" key="com.intellij.ide.util.TipDialog" timestamp="1597590436583">
-      <screen x="0" y="23" width="1440" height="800" />
+    <state x="426" y="251" key="com.intellij.ide.util.TipDialog" timestamp="1597626746034">
+      <screen x="0" y="23" width="1440" height="791" />
     </state>
-    <state x="426" y="251" key="com.intellij.ide.util.TipDialog/0.23.1440.791@0.23.1440.791" timestamp="1597558809837" />
+    <state x="426" y="251" key="com.intellij.ide.util.TipDialog/0.23.1440.791@0.23.1440.791" timestamp="1597626746034" />
     <state x="426" y="254" key="com.intellij.ide.util.TipDialog/0.23.1440.800@0.23.1440.800" timestamp="1597590436583" />
     <state x="426" y="254" key="com.intellij.ide.util.TipDialog/0.23.1440.803@0.23.1440.803" timestamp="1597235512199" />
     <state x="348" y="93" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1597453775608">

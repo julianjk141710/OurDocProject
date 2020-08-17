@@ -51,5 +51,6 @@ urlpatterns = [
     path('apis/user/hasRead', views.hasRead),  # 将站内信标示为已读
     path('apis/user/send_invitation', views.send_invitation),  # 发送团队邀请
     path('apis/user/addinto_team', views.addinto_team),#同意加入队伍
+    path('apis/user/modifyPassword', views.UserMethod.modifyPassword),#更改密码
     # path('apis/user/bonjour', views.bonjour) #删除收藏
 ]
