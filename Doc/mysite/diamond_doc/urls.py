@@ -54,5 +54,6 @@ urlpatterns = [
     path('apis/user/modifyPassword', views.UserMethod.modifyPassword),#更改密码
     path('apis/user/showreviews', views.showReviews),#展示评论
     path('apis/user/showteammembers', views.showTeamMembers),#展示团队成员
+    path('apis/user/getotherinfo', views.getOtherInfo),#展示团队成员
     # path('apis/user/bonjour', views.bonjour) #删除收藏
 ]

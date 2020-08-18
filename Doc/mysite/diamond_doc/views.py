@@ -18,6 +18,7 @@ def sayHello(request):
 #myInfo:true
 def getInfo(request):
     if request.method == "POST":
+        print("获取个人信息")
         data = json.loads(request.body)
         show_myInfo = data.get("myInfo")
 
@@ -35,6 +36,38 @@ def getInfo(request):
                 "status" : 1,
                 "message": "请求错误"
             })
+
+def getOtherInfo(request):
+    if request.method == "POST":
+        print("getotherinfo")
+        data = json.loads(request.body)
+        getotherinfo = data.get("getotherinfo")
+        if getotherinfo is not None and getotherinfo == "getotherinfo":
+            user_email = data.get("user_email")
+            userSet = UserInfo.objects.all()
+            for i in userSet:
+                if i.user.email == user_email:
+                    return JsonResponse({
+                        "status":0,
+                        "user_email":i.user.email,
+                        "user_nickname":i.user_nickname
+                    })
+            return JsonResponse({
+                "status":1,
+                "message":"查无此人"
+            })
+        else:
+            return JsonResponse({
+                "status": 2,
+                "message": "参数错误"
+            })
+    else:
+        return JsonResponse({
+            "status": 3,
+            "message": "请求错误"
+        })
+
+
 
 class FileMethod:
 
@@ -1043,7 +1076,7 @@ def add_review(request):
                 db = FileReviews(review_text=data.get("review_text"), user_id=userInfo,file_id=fileInfo)
                 db.save()
                 return JsonResponse({
-                    "status_code": 0,
+                    "status": 0,
                     "data": "success",
                     "file_id": data.get("file_id")
                 })
@@ -1678,6 +1711,7 @@ def showTeamMembers(request):
 
 def showReviews(request):
     if request.method == "POST":
+        print("展示评论")
         data = json.loads(request.body)
         showreviews = data.get("showreviews")
         if showreviews is not None and showreviews == "showreviews":
