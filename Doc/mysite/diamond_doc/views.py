@@ -1779,3 +1779,34 @@ def dismissTeam(request):
             "status": 3,
             "message": "请求错误"
         })
+
+def getTeamInformation(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        team = data.get("team")
+        if team is not None and team == "team":
+            team_id = data.get("team_id")
+            teamInfo = TeamInfo.objects.filter(team_id = team_id).first()
+            if teamInfo:
+                return JsonResponse({
+                    "status":0,
+                    "team_description":teamInfo.team_description,
+                    "team_name":teamInfo.team_name,
+                    "team_id":teamInfo.team_id,
+                    "team_manager":teamInfo.team_manager
+                })
+            else:
+                return JsonResponse({
+                    "status": 1,
+                    "message":"团队不存在"
+                })
+        else:
+            return JsonResponse({
+                "status": 2,
+                "message": "参数错误"
+            })
+    else:
+        return JsonResponse({
+            "status": 3,
+            "message": "请求错误"
+        })
