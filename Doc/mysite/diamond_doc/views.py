@@ -44,8 +44,11 @@ def getOtherInfo(request):
         getotherinfo = data.get("getotherinfo")
         if getotherinfo is not None and getotherinfo == "getotherinfo":
             user_email = data.get("user_email")
+            print(user_email)
+            print("1212")
             userSet = UserInfo.objects.all()
             for i in userSet:
+                print(i.user.email)
                 if i.user.email == user_email:
                     return JsonResponse({
                         "status":0,
@@ -1747,3 +1750,32 @@ def showReviews(request):
                 "status": 3,
                 "message": "请求错误"
             })
+
+def dismissTeam(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        dismissteam = data.get("dismissteam")
+        if dismissteam is not None and dismissteam == "dismissteam":
+            team_id = data.get("team_id")
+            teamInfo = TeamInfo.objects.filter(team_id = team_id).first()
+            if teamInfo:
+                teamInfo.delete()
+                return JsonResponse({
+                    "status":0,
+                    "message":"解散成功"
+                })
+            else:
+                return JsonResponse({
+                    "status": 1,
+                    "message": "团队不存在"
+                })
+        else:
+            return JsonResponse({
+                "status": 2,
+                "message": "参数错误"
+            })
+    else:
+        return JsonResponse({
+            "status": 3,
+            "message": "请求错误"
+        })
