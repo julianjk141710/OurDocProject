@@ -5,7 +5,7 @@ import time
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, AnonymousUser
 
-from .models import UserInfo, FileInformation, FileReview, RecentBrowse, TeamInfo, GeneralAuthority, SpecificAuthority, \
+from .models import UserInfo, FileInformation, FileReviews, RecentBrowse, TeamInfo, GeneralAuthority, SpecificAuthority, \
     Favorites, TeamUser, TeamFile, DocTemplates, NotificationsInfo
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -197,7 +197,7 @@ class FileMethod:
                             recentbrowse.save()
                         return JsonResponse({
                             "status": 0,
-                            "file_text": retFile.file_text,
+                            "file_text": str(retFile.file_text),
                             "file_name": retFile.file_name,
                             "file_founder": retFile.file_founder.user.email,
                             "file_is_delete": retFile.file_is_delete,
@@ -263,7 +263,9 @@ class FileMethod:
                 file_id = data.get("file_id")
                 fileInfo = FileInformation.objects.filter(file_id=file_id).first()
                 if fileInfo:
+                    print("不是空的fileInfo")
                     fileInfo.file_is_free = 1
+                    fileInfo.save()
                     return JsonResponse({
                         "status": 0,
                         "message": "读文档结束"
@@ -520,6 +522,13 @@ class FileMethod:
         if request.method == "POST":
             data = json.loads(request.body)
             setSpeAuthor = data.get("setSpeAuthor")
+            setOther = data.get("setOther")
+            tempfile = FileInformation.objects.filter(data.get("file_id")).first()
+            if not tempfile:
+                return JsonResponse({
+                    "status":5,
+                    "message":"文档不存在"
+                })
             if setSpeAuthor is not None and setSpeAuthor == "setSpeAuthor":
                 file_id = data.get("file_id")
                 fileInfo = FileInformation.objects.filter(file_id = file_id).first()
@@ -551,6 +560,47 @@ class FileMethod:
                         "status": 2,
                         "message": "文档不存在"
                     })
+            elif setOther is not None and setOther == "setOther":
+                file_id = data.get("file_id")
+                fileInfo = FileInformation.objects.filter(file_id=file_id).first()
+                team_id = data.get("team_id")
+                user_email = data.get("user_email")
+                tmpTeam = TeamInfo.objects.filter(team_id = team_id).first()
+                memSet = TeamUser.objects.filter(team_info = tmpTeam).first()
+                for i in memSet:
+                    if i.user_info.user.email == user_email:
+                        tmpUserInfo = i
+                        tmpSpeAuthor = SpecificAuthority.objects.filter(user_info = tmpUserInfo, file_info = fileInfo).first()
+                        if tmpSpeAuthor:
+                            tmpSpeAuthor.read_file = data.get("read_file")
+                            tmpSpeAuthor.write_file = data.get("write_file")
+                            tmpSpeAuthor.share_file = data.get("share_file")
+                            tmpSpeAuthor.review_file = data.get("review_file")
+                            tmpSpeAuthor.save()
+                            return JsonResponse({
+                                "status": 0,
+                                "message": "修改特定权限成功",
+                                "file_id": file_id,
+                                "read_file": tmpSpeAuthor.read_file,
+                                "write_file": tmpSpeAuthor.write_file,
+                                "share_file": tmpSpeAuthor.share_file,
+                                "review_file": tmpSpeAuthor.review_file,
+                            })
+                        else:
+                            newSpeAuthor = SpecificAuthority(file_info = fileInfo, user_info = tmpUserInfo,
+                                                             read_file = data.get("read_file"), write_file = data.get("write_file"),
+                                                             share_file = data.get("share_file"), review_file = data.get("review_file"))
+
+                            newSpeAuthor.save()
+                            return JsonResponse({
+                                "status": 0,
+                                "message": "修改特定权限成功",
+                                "file_id": file_id,
+                                "read_file": newSpeAuthor.read_file,
+                                "write_file": newSpeAuthor.write_file,
+                                "share_file": newSpeAuthor.share_file,
+                                "review_file": newSpeAuthor.review_file,
+                            })
             else:
                 return JsonResponse({
                     "status":3,
@@ -803,12 +853,14 @@ class UserMethod:
     @staticmethod
     def get_status(request):
         if request.user.is_authenticated:
+            print("登陆")
             return JsonResponse({
                 "status": 0,
                 "username": str(request.user),
                 "email": str(request.user.email),
             })
         else:
+            print("没登陆")
             return JsonResponse({
                 "status": 1
             })
@@ -988,7 +1040,7 @@ def add_review(request):
                 # try:
                 fileInfo = FileInformation.objects.filter(file_id=data.get("file_id")).first()
                 userInfo = UserInfo.objects.get(user = request.user)
-                db = FileReview(review_text=data.get("review_text"), user_id=userInfo,file_id=fileInfo)
+                db = FileReviews(review_text=data.get("review_text"), user_id=userInfo,file_id=fileInfo)
                 db.save()
                 return JsonResponse({
                     "status_code": 0,
@@ -1017,6 +1069,7 @@ def add_review(request):
 #创建团队
 def create_team(request):
     if request.method == "POST":
+        print("创建团队")
         data = json.loads(request.body)
         create = data.get("create")
         if create is not None and create=="create":
@@ -1097,7 +1150,7 @@ def delete_favorite(request):
             if tmpfavorite and userInfo:
                 tmpfavorite.delete()
                 return JsonResponse({
-                    "status_code": 0,
+                    "status": 0,
                     "data": "删除收藏成功！",
                     "file_id":data.get("file_id")
                 })
@@ -1589,3 +1642,74 @@ def send_invitation(request):
             "status": 4,
             "message": "error method"
         })
+
+
+def showTeamMembers(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        showteam = data.get("showteam")
+        if showteam is not None and showteam == "showteam":
+            team_id = data.get("team_id")
+            teamInfo = TeamInfo.objects.filter(team_id = team_id)
+            teamMemSet = TeamUser.objects.all()
+            retTeamMemEmail = []
+            retTeamMemName = []
+            for i in teamMemSet:
+                if i.team_info == teamInfo:
+                    retTeamMemEmail.append(i.user_info.user.email)
+                    retTeamMemName.append(i.user_info.user_nickname)
+            return JsonResponse({
+                "status":0,
+                "retTeamMemEmail":retTeamMemEmail,
+                "retTeamMemName":retTeamMemName
+            })
+        else:
+            return JsonResponse({
+                "status": 1,
+                "message":"参数错误"
+            })
+    else :
+        return JsonResponse({
+            "status": 2,
+            "message": "请求错误"
+        })
+
+
+
+def showReviews(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        showreviews = data.get("showreviews")
+        if showreviews is not None and showreviews == "showreviews":
+            file_id = data.get("file_id")
+            fileInfo = FileInformation.objects.filter(file_id = file_id).first()
+            if fileInfo:
+                reviewSet = FileReviews.objects.all()
+                retReviewTextList = []
+                retReviewerList = []
+                retReviewTimeList = []
+                for i in reviewSet:
+                    retReviewTextList.append(i.review_text)
+                    retReviewerList.append(i.user_id.user.email)
+                    retReviewTimeList.append(i.review_time)
+                return JsonResponse({
+                    "status":0,
+                    "retReviewTextList":retReviewTextList,
+                    "retReviewerList":retReviewerList,
+                    "retReviewTimeList":retReviewTimeList
+                })
+            else :
+                return JsonResponse({
+                    "status": 1,
+                    "message":"文档不存在"
+                })
+        else:
+            return JsonResponse({
+                "status": 2,
+                "message": "参数错误"
+            })
+    else:
+        return JsonResponse({
+                "status": 3,
+                "message": "请求错误"
+            })

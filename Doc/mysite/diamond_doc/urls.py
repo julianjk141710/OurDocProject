@@ -34,7 +34,7 @@ urlpatterns = [
     path('apis/user/add_favorite', views.add_favorite), #添加收藏
     path('apis/user/delete_favorite', views.delete_favorite), #删除收藏
     path('apis/user/my_favorite', views.my_favorite), #获取收藏的文档id和名字
-    # path('apis/user/file', views.FileMethod.getFile),#文件上传视图
+    path('apis/user/file', views.FileMethod.getFile),#文件上传视图
     # path('apis/user/add_teammate', views.add_teammate), #添加团队成员
     path('apis/user/delete_teammate', views.delete_teammate), #删除团队成员
     path('apis/user/myFile', views.FileMethod.myFile), #获取我的文档
@@ -52,5 +52,7 @@ urlpatterns = [
     path('apis/user/send_invitation', views.send_invitation),  # 发送团队邀请
     path('apis/user/addinto_team', views.addinto_team),#同意加入队伍
     path('apis/user/modifyPassword', views.UserMethod.modifyPassword),#更改密码
+    path('apis/user/showreviews', views.showReviews),#展示评论
+    path('apis/user/showteammembers', views.showTeamMembers),#展示团队成员
     # path('apis/user/bonjour', views.bonjour) #删除收藏
 ]

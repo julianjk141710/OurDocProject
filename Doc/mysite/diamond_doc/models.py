@@ -47,7 +47,15 @@ class FileReview(models.Model):
     review_text = models.CharField(max_length = 512)
     review_time = models.DateTimeField(auto_now_add = True)
     class Meta:
-        unique_together = (("file_id"),)
+        unique_together = (("file_id",),)
+
+class FileReviews(models.Model):
+    file_id = models.ForeignKey(FileInformation, on_delete = models.CASCADE)
+    user_id = models.ForeignKey(UserInfo, on_delete = models.CASCADE)
+    review_text = models.CharField(max_length = 512)
+    review_time = models.DateTimeField(auto_now_add = True)
+    class Meta:
+        unique_together = (("file_id", "user_id"),)
 
 class RecentBrowse(models.Model):
     file_id = models.ForeignKey(FileInformation, on_delete=models.CASCADE)
