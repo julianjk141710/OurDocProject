@@ -559,7 +559,7 @@ class FileMethod:
             data = json.loads(request.body)
             setSpeAuthor = data.get("setSpeAuthor")
             setOther = data.get("setOther")
-            tempfile = FileInformation.objects.filter(data.get("file_id")).first()
+            tempfile = FileInformation.objects.filter(file_id = data.get("file_id")).first()
             if not tempfile:
                 return JsonResponse({
                     "status":5,
@@ -602,10 +602,12 @@ class FileMethod:
                 team_id = data.get("team_id")
                 user_email = data.get("user_email")
                 tmpTeam = TeamInfo.objects.filter(team_id = team_id).first()
-                memSet = TeamUser.objects.filter(team_info = tmpTeam).first()
+                memSet = TeamUser.objects.filter(team_info = tmpTeam)
+                print(memSet)
                 for i in memSet:
+                    print(i.user_info.user.email)
                     if i.user_info.user.email == user_email:
-                        tmpUserInfo = i
+                        tmpUserInfo = i.user_info
                         tmpSpeAuthor = SpecificAuthority.objects.filter(user_info = tmpUserInfo, file_info = fileInfo).first()
                         if tmpSpeAuthor:
                             tmpSpeAuthor.read_file = data.get("read_file")
@@ -637,6 +639,7 @@ class FileMethod:
                                 "share_file": newSpeAuthor.share_file,
                                 "review_file": newSpeAuthor.review_file,
                             })
+
             else:
                 return JsonResponse({
                     "status":3,
@@ -1686,19 +1689,27 @@ def showTeamMembers(request):
         showteam = data.get("showteam")
         if showteam is not None and showteam == "showteam":
             team_id = data.get("team_id")
-            teamInfo = TeamInfo.objects.filter(team_id = team_id)
-            teamMemSet = TeamUser.objects.all()
-            retTeamMemEmail = []
-            retTeamMemName = []
-            for i in teamMemSet:
-                if i.team_info == teamInfo:
-                    retTeamMemEmail.append(i.user_info.user.email)
-                    retTeamMemName.append(i.user_info.user_nickname)
-            return JsonResponse({
-                "status":0,
-                "retTeamMemEmail":retTeamMemEmail,
-                "retTeamMemName":retTeamMemName
-            })
+            teamInfo = TeamInfo.objects.filter(team_id = team_id).first()
+            if teamInfo:
+                teamMemSet = TeamUser.objects.all()
+                retTeamMemEmail = []
+                retTeamMemName = []
+                for i in teamMemSet:
+                    if i.team_info == teamInfo:
+                        retTeamMemEmail.append(i.user_info.user.email)
+                        retTeamMemName.append(i.user_info.user_nickname)
+                retTeamMemEmail.append(teamInfo.team_manager.user.email)
+                retTeamMemName.append(teamInfo.team_manager.user_nickname)
+                return JsonResponse({
+                    "status":0,
+                    "retTeamMemEmail":retTeamMemEmail,
+                    "retTeamMemName":retTeamMemName
+                })
+            else:
+                return JsonResponse({
+                    "status": 1,
+                    "message": "队伍不存在"
+                })
         else:
             return JsonResponse({
                 "status": 1,
@@ -1793,7 +1804,7 @@ def getTeamInformation(request):
                     "team_description":teamInfo.team_description,
                     "team_name":teamInfo.team_name,
                     "team_id":teamInfo.team_id,
-                    "team_manager":teamInfo.team_manager
+                    "team_manager":teamInfo.team_manager.user.email
                 })
             else:
                 return JsonResponse({
