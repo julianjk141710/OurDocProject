@@ -388,14 +388,15 @@ class FileMethod:
                     fileInfo = FileInformation(file_text = content, file_founder = userInfo, file_is_free = 1, file_is_delete = 0,
                                                file_name = file_name, file_id = int(str(time.time()).split('.')[0]))
                     fileInfo.save()
-                    genAuthority = GeneralAuthority(file_info = fileInfo, read_file = 0, write_file = 0, share_file = 0, review_file = 0)
+                    genAuthority = GeneralAuthority(file_info = fileInfo, read_file = 1, write_file = 0, share_file = 1, review_file = 0)
                     genAuthority.save()
                     speAuthority = SpecificAuthority(user_info = userInfo, file_info = fileInfo,
                                                      read_file = 1, write_file = 1, share_file = 1, review_file = 1)
                     speAuthority.save()
                     return JsonResponse({
                         "status":0,
-                        "message":"富文本上传成功"
+                        "message":"富文本上传成功",
+                        "file_id":fileInfo.file_id
                     })
                 else:
                     return JsonResponse({
